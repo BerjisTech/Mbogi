@@ -44,6 +44,9 @@ public:
   UFUNCTION(BlueprintCallable, CallInEditor, Category = "Neighbors")
   void UpdateNeighborDistances();
 
+  UPROPERTY(EditAnywhere, Category = "Visual")
+  TSubclassOf<AActor> BP_SplineTool_Tiedtke_Wires_Class;
+
 protected:
   // Called when the game starts or when spawned
   virtual void BeginPlay() override;
@@ -59,6 +62,10 @@ public:
   // Returns the path to the target location
   UFUNCTION(BlueprintCallable, Category = "Pathfinding")
   TArray<ALocationBox *> GetPathToTarget();
+
+  // DestroyActorDelayed destroys specified actor after specified delay
+  UFUNCTION(BlueprintCallable, Category = "Pathfinding")
+  void DestroyActorDelayed(AActor *ActorToDestroy);
 
 private:
   void CalculateDistances();

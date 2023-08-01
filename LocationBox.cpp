@@ -2,6 +2,7 @@
 
 #include "LocationBox.h"
 #include "Components/BoxComponent.h"
+#include "Engine/World.h"
 #include "NavigationHelperComponent.h"
 #include <vcruntime.h>
 
@@ -136,6 +137,12 @@ TArray<ALocationBox *> ALocationBox::GetPathToTarget() {
   return TArray<ALocationBox *>();
 }
 
+void ALocationBox::DestroyActorDelayed(AActor *ActorToDestroy) {
+  if (ActorToDestroy) {
+    ActorToDestroy->Destroy();
+  }
+}
+
 TArray<ALocationBox *> ALocationBox::FindPathTo(ALocationBox *Goal) {
   // The set of nodes already evaluated
   TSet<ALocationBox *> ClosedSet;
@@ -177,6 +184,21 @@ TArray<ALocationBox *> ALocationBox::FindPathTo(ALocationBox *Goal) {
       }
       Path.Insert(Current, 0);
 
+      // Spawn BP_SplineTool_Tiedtke_Wires at each location in the path
+      for (ALocationBox *Location : Path) {
+        FTransform Transform(Location->GetActorLocation());
+        AActor *SpawnedActor = GetWorld()->SpawnActor<AActor>(
+            BP_SplineTool_Tiedtke_Wires_Class, Transform);
+
+        // Set a timer to destroy the actor after 10 seconds
+        FTimerHandle TimerHandle;
+        FTimerDelegate TimerDel;
+        TimerDel.BindUFunction(this, FName("DestroyActorDelayed"),
+                               SpawnedActor);
+        GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDel, 10.0f,
+                                               false);
+      }
+
       // Construct the path string for debugging
       FString PathString = TEXT("Path: ");
       for (ALocationBox *Location : Path) {
@@ -184,7 +206,7 @@ TArray<ALocationBox *> ALocationBox::FindPathTo(ALocationBox *Goal) {
       }
 
       // Display the path on screen
-      GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, PathString);
+      GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Green, PathString);
 
       return Path;
     }
