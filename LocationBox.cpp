@@ -42,6 +42,17 @@ void ALocationBox::CalculateDistances() {
   }
 }
 
+void ALocationBox::UpdateNeighborDistances() {
+  for (auto &NeighborPair : Neighbors) {
+    ALocationBox *Neighbor = NeighborPair.Value.Neighbor;
+    if (Neighbor && Neighbor != this) {
+      float CalculatedDistance =
+          FVector::Dist(GetActorLocation(), Neighbor->GetActorLocation());
+      NeighborPair.Value.Distance = CalculatedDistance;
+    }
+  }
+}
+
 void ALocationBox::OnOverlapBegin(UPrimitiveComponent *OverlappedComp,
                                   AActor *OtherActor,
                                   UPrimitiveComponent *OtherComp,

@@ -41,7 +41,7 @@ public:
   UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Location Data")
   TMap<FString, FNeighborData> Neighbors;
 
-  UFUNCTION(BlueprintCallable, Category = "Neighbors")
+  UFUNCTION(BlueprintCallable, CallInEditor, Category = "Neighbors")
   void UpdateNeighborDistances();
 
 protected:
@@ -79,14 +79,3 @@ private:
                       int32 OtherBodyIndex, bool bFromSweep,
                       const FHitResult &SweepResult);
 };
-
-void ALocationBox::UpdateNeighborDistances() {
-  for (auto &NeighborPair : Neighbors) {
-    ALocationBox *Neighbor = NeighborPair.Key;
-    if (Neighbor && Neighbor != this) {
-      float CalculatedDistance =
-          FVector::Dist(GetActorLocation(), Neighbor->GetActorLocation());
-      NeighborPair.Value.Distance = CalculatedDistance;
-    }
-  }
-}
